@@ -1,1 +1,1 @@
-# rust-pong
+# rust_pong
