@@ -11,11 +11,15 @@ use amethyst::renderer::{
 
 pub struct Pong;
 
+const SPRITESHEET_SIZE:  (f32, f32) = (8.0, 16.0);
+
 impl<'a, 'b> State<GameData<'a,'b>> for Pong {
 	fn on_start(&mut self, data: StateData<GameData>) {
 		let world = data.world;
-		// registers paddle in the world
+
+		// registers components in the world
 		world.register::<Paddle>();
+		world.register::<Ball>();
 
 		// load spritesheet
 		let spritesheet = {
@@ -29,9 +33,11 @@ impl<'a, 'b> State<GameData<'a,'b>> for Pong {
 				&texture_storage,
 			)
 		};
+		initialise_ball(world, spritesheet.clone());
+		initialise_paddles(world, spritesheet.clone());
 
-		initialise_paddles(world, spritesheet);
 		initialise_camera(world);
+
 	}
 
 
@@ -48,6 +54,8 @@ impl<'a, 'b> State<GameData<'a,'b>> for Pong {
 		Trans::None
 	}
 }
+
+
 
 
 //
@@ -72,9 +80,53 @@ fn initialise_camera(world: &mut World) {
 
 
 
+//
+// ball game component
+//
+pub const BALL_RADIUS: f32 = 2.0;
+pub struct Ball {
+	pub radius : f32,
+	pub restitution: f32,
+	pub velocity: Vector3<f32>,
+}
+impl Ball {
+	fn new() -> Ball {
+		Ball {
+			radius: BALL_RADIUS,
+			restitution: 1.0,
+			velocity: Vector3::new(0.0,1.0,0.0),
+		}
+	}
+}
+
+impl Component for Ball {
+	type Storage = DenseVecStorage<Self>;
+}
+
+fn initialise_ball(world: &mut World, spritesheet: TextureHandle) {
+	let mut ball_transform = Transform::default();
+	ball_transform.translation = Vector3::new(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 0.0);
+
+	let sprite = Sprite {
+		left: 4.0,
+		right: 8.0,
+		top: 0.0,
+		bottom: 4.0,
+	};
+
+	// create ball
+	world.create_entity()
+		.with_sprite(&sprite, spritesheet, SPRITESHEET_SIZE)
+			.expect("Failed to add sprite render on ball")
+		.with(Ball::new())
+		.with(GlobalTransform::default())
+		.with(ball_transform)
+		.build();
+}
+
 
 //
-// pong game components
+// paddle game component
 //
 pub const PADDLE_HEIGHT: f32 = 16.0;
 pub const PADDLE_WIDTH: f32 = 4.0;
@@ -105,9 +157,6 @@ impl Component for Paddle {
 }
 
 fn initialise_paddles(world: &mut World, spritesheet: TextureHandle) {
-
-	const SPRITESHEET_SIZE:  (f32, f32) = (8.0, 16.0);
-
 	let mut left_transform = Transform::default();
 	let mut right_transform = Transform::default();
 	// paddle position
@@ -133,7 +182,7 @@ fn initialise_paddles(world: &mut World, spritesheet: TextureHandle) {
 		.build();
 	// create right paddle
 	world.create_entity()
-		.with_sprite(&sprite, spritesheet, SPRITESHEET_SIZE) // inefficent useing the same sprite should use SpriteRenderData instead
+		.with_sprite(&sprite, spritesheet.clone(), SPRITESHEET_SIZE) // inefficent useing the same sprite should use SpriteRenderData instead
 			.expect("Failed to add sprite render on right paddle")
 		.with(Paddle::new(Side::Right))
 		.with(GlobalTransform::default())

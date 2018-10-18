@@ -5,6 +5,7 @@ use amethyst::prelude::*;
 use amethyst::core::transform::TransformBundle;
 use amethyst::renderer::{DisplayConfig, DrawFlat, Pipeline, PosTex, RenderBundle, Stage};
 use amethyst::input::InputBundle;
+
 fn main() -> amethyst::Result<()> {
 	amethyst::start_logger(Default::default());
 
@@ -23,12 +24,12 @@ fn main() -> amethyst::Result<()> {
 	);
 	let input_bundle = InputBundle::<String, String>::new().with_bindings_from_file(input_binding_path)?;
 
-
 	let game_data = GameDataBuilder::default()
 		.with_bundle(TransformBundle::new())?
 		.with_bundle(RenderBundle::new(pipe, Some(config)))?
 		.with_bundle(input_bundle)?
-		.with(systems::PaddleSystem, "paddle_system", &["input_system"]);
+		.with(systems::PaddleSystem, "paddle_system", &["input_system"])
+		.with(systems::BallSystem, "ball_system", &[]);
 	let mut game = Application::new(app_path, pong::Pong, game_data)?;
 	game.run();
 	Ok(())
