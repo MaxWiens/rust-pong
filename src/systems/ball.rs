@@ -1,38 +1,53 @@
 use amethyst::core::transform::components::Transform;
 use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
 use pong::{Paddle, Ball, ARENA_HEIGHT, ARENA_WIDTH, BALL_RADIUS};
-pub struct BallSystem;
+pub struct BallMovement;
 
-impl<'s> System<'s> for BallSystem {
+impl<'s> System<'s> for BallMovement {
 	type SystemData = (
 		// writing ot the transform values
 		WriteStorage<'s, Transform>,
-
-		// reading form the paddle values
-		ReadStorage<'s, Paddle>,
 
 		// reading form the Ball values
 		ReadStorage<'s, Ball>,
 	);
 
-	fn run(&mut self, (mut transforms, paddles, balls): Self::SystemData) {
-		let mut dx : f32 = 0.0;
-		let mut dy : f32 = 0.0;
-		let mut new_angle : Option<f32> = None;
+	fn run(&mut self, (mut transforms, balls): Self::SystemData) {
 		for (ball, transform) in (&balls, &mut transforms).join() {
-			dx = (transform.translation.x + ball.velocity.x)
+			transform.translation.x = (transform.translation.x + ball.velocity.x)
 				.min(ARENA_WIDTH - BALL_RADIUS)
 				.max(BALL_RADIUS);
-			dy = (transform.translation.y + ball.velocity.y)
+			transform.translation.y = (transform.translation.y + ball.velocity.y)
 				.min(ARENA_HEIGHT - BALL_RADIUS)
 				.max(BALL_RADIUS);
 		}
-		for (paddle, transform) in  (&paddles, &transforms).join() {
-			// if is colliding
-			new_angle = Some((dy/dx).atan());
-		}
-		if let Some(angle) = new_angle {
-			angle
-		}
 	}
+}
+
+
+pub struct BallBounce;
+impl<'s> System<'s> for BallBounce {
+	type SystemData = (
+		WriteStorage<'s, Ball>,
+		ReadStorage<'s, Transform>,
+		ReadStorage<'s, Paddle>
+	);
+
+	fn run(&mut self, (mut balls, transforms, paddles): Self::SystemData){
+		for (ball, transform, paddle) in (&mut balls, &transforms, &paddles).join() {
+
+
+			/*
+			transform.translation.x = (transform.translation.x + ball.velocity.x)
+				.min(ARENA_WIDTH - BALL_RADIUS)
+				.max(BALL_RADIUS);
+			transform.translation.y = (transform.translation.y + ball.velocity.y)
+				.min(ARENA_HEIGHT - BALL_RADIUS)
+				.max(BALL_RADIUS);
+			*/
+		}
+
+	}
+
+
 }

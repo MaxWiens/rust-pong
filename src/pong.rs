@@ -94,7 +94,7 @@ impl Ball {
 		Ball {
 			radius: BALL_RADIUS,
 			restitution: 1.0,
-			velocity: Vector3::new(0.0,1.0,0.0),
+			velocity: Vector3::new(1.0,0.0,0.0),
 		}
 	}
 }
