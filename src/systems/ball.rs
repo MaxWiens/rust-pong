@@ -1,6 +1,6 @@
 use amethyst::core::transform::components::Transform;
 use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
-use pong::{Paddle, Ball, ARENA_HEIGHT, ARENA_WIDTH, BALL_RADIUS};
+use pong::{Paddle, Ball, ARENA_HEIGHT, ARENA_WIDTH, BALL_RADIUS, PADDLE_WIDTH, PADDLE_HEIGHT};
 pub struct BallMovement;
 
 impl<'s> System<'s> for BallMovement {
@@ -34,8 +34,16 @@ impl<'s> System<'s> for BallBounce {
 	);
 
 	fn run(&mut self, (mut balls, transforms, paddles): Self::SystemData){
-		for (ball, transform, paddle) in (&mut balls, &transforms, &paddles).join() {
+		for (ball, ball_transform) in (&mut balls, &transforms).join() {
 
+			for (paddle, paddle_transform) in (&paddles, &transforms).join() {
+				if ball_transform.translation.x <= paddle_transform.translation.x + PADDLE_WIDTH &&
+				   ball_transform.translation.x >= paddle_transform.translation.x &&
+				   ball_transform.translation.y <= paddle_transform.translation.y &&
+				   ball_transform.translation.y >= paddle_transform.translation.y + PADDLE_HEIGHT {
+
+				}
+			}
 
 			/*
 			transform.translation.x = (transform.translation.x + ball.velocity.x)
