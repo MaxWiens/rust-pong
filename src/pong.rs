@@ -84,6 +84,7 @@ fn initialise_camera(world: &mut World) {
 // ball game component
 //
 pub const BALL_RADIUS: f32 = 2.0;
+pub const BALL_SPEED: f32 = 1.0;
 pub struct Ball {
 	pub radius : f32,
 	pub restitution: f32,
@@ -94,7 +95,7 @@ impl Ball {
 		Ball {
 			radius: BALL_RADIUS,
 			restitution: 1.0,
-			velocity: Vector3::new(1.0,0.0,0.0),
+			velocity: Vector3::new(BALL_SPEED,0.0,0.0),
 		}
 	}
 }
@@ -130,6 +131,7 @@ fn initialise_ball(world: &mut World, spritesheet: TextureHandle) {
 //
 pub const PADDLE_HEIGHT: f32 = 16.0;
 pub const PADDLE_WIDTH: f32 = 4.0;
+pub const PADDLE_SPEED: f32 = 1.2;
 #[derive(PartialEq, Eq)]
 pub enum Side {
 	Left,
@@ -140,6 +142,7 @@ pub struct Paddle {
 	pub side: Side,
 	pub width: f32,
 	pub height: f32,
+	pub velocity : Vector3<f32>
 }
 
 impl Paddle {
@@ -148,6 +151,7 @@ impl Paddle {
 			side: side,
 			width: 1.0,
 			height: 1.0,
+			velocity: Vector3::new(0.0,0.0,0.0),
 		}
 	}
 }
