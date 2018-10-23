@@ -35,11 +35,8 @@ impl<'a, 'b> State<GameData<'a,'b>> for Pong {
 		};
 		initialise_ball(world, spritesheet.clone());
 		initialise_paddles(world, spritesheet.clone());
-
 		initialise_camera(world);
-
 	}
-
 
 	fn handle_event(&mut self, _: StateData<GameData>, event:Event) -> Trans<GameData<'a,'b>> {
 		if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
@@ -54,9 +51,6 @@ impl<'a, 'b> State<GameData<'a,'b>> for Pong {
 		Trans::None
 	}
 }
-
-
-
 
 //
 // camera
@@ -89,6 +83,7 @@ pub struct Ball {
 	pub radius : f32,
 	pub restitution: f32,
 	pub velocity: Vector3<f32>,
+	pub in_contact: bool,
 }
 impl Ball {
 	fn new() -> Ball {
@@ -96,6 +91,7 @@ impl Ball {
 			radius: BALL_RADIUS,
 			restitution: 1.0,
 			velocity: Vector3::new(BALL_SPEED,0.0,0.0),
+			in_contact: false,
 		}
 	}
 }
@@ -191,5 +187,33 @@ fn initialise_paddles(world: &mut World, spritesheet: TextureHandle) {
 		.with(Paddle::new(Side::Right))
 		.with(GlobalTransform::default())
 		.with(right_transform)
+		.build();
+}
+
+//
+// Score Component
+//
+pub struct Score {
+	pub right_score: i8,
+	pub left_score: i8,
+}
+
+impl Score {
+	fn new() -> Score {
+		Score {
+			right_score: 0,
+			left_score: 0,
+		}
+	}
+}
+
+impl Component for Score {
+	type Storage = DenseVecStorage<Self>;
+}
+
+fn initialise_score(world: &mut World) {
+	// create score
+	world.create_entity()
+		.with(Score::new())
 		.build();
 }
